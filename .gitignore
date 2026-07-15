@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+
+# Production output
+dist/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.ingest.example
+
+# Supabase local/runtime files
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+supabase/functions/.env
+
+# Local-only course materials and private lesson sources
+course-materials/private/
+course-materials/uploads/
+course-materials/raw/
+private-course-materials/
+local-content/
+local-seeds/
+*.private.sql
+
+# Local backups and temporary files
+*.before-*
+*.backup
+*.bak
+*.tmp
+*.swp
+*~
+.DS_Store
+Thumbs.db
+
+# TypeScript/Vite generated files
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# Editors
+.vscode/
+.idea/
+
+# Test/coverage output
+coverage/
+.playwright/
+test-results/
+
+# macOS AppleDouble metadata
+._*
+
+# Private or copyrighted teaching documents
+course-materials/**/*.pdf
+course-materials/**/*.ppt
+course-materials/**/*.pptx
+course-materials/**/*.doc
+course-materials/**/*.docx
+course-materials/**/*.key
+course-materials/**/*.odp
+course-materials/**/*.pages
+
+# Private or copyrighted teaching documents
+course-materials/**/*.pdf
+course-materials/**/*.ppt
+course-materials/**/*.pptx
+course-materials/**/*.doc
+course-materials/**/*.docx
+course-materials/**/*.key
+course-materials/**/*.odp
+course-materials/**/*.pages
