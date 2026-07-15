@@ -78,3 +78,9 @@ course-materials/**/*.docx
 course-materials/**/*.key
 course-materials/**/*.odp
 course-materials/**/*.pages
+
+# Development copies
+*_old
+*_old.*
+*_before_*
+*_before_*.*
