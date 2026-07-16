@@ -387,3 +387,16 @@
 .daily-term-list dd{margin:0;overflow-wrap:anywhere}
 @media(max-width:600px){.feedback-heading-row{align-items:flex-start}.feedback-heading-row>button{flex:0 0 auto}.daily-term-list>div{grid-template-columns:1fr;gap:.2rem}}
 
+/* Version 2.5: dark-mode top application bar */
+.dark .main > header {
+  background: rgba(19, 34, 29, 0.96);
+  color: var(--ink);
+  border-bottom-color: var(--line);
+}
+
+.dark .main > header .desktop-subtitle,
+.dark .main > header .mobile-brand,
+.dark .main > header .mobile-brand span {
+  color: var(--ink) !important;
+}
+

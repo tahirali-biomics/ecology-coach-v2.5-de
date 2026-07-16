@@ -30,10 +30,14 @@ export type LessonQuestionType =
   | "ordering"
   | "short_answer";
 
-export type LessonQuestionOption = {
-  value: string | boolean | number;
-  label: string;
-};
+export type LessonQuestionOption =
+  | string
+  | number
+  | boolean
+  | {
+      value: string | boolean | number;
+      label: string;
+    };
 
 export type LessonQuestion = {
   id: number;
@@ -117,12 +121,77 @@ function normalizeTrueFalseValue(
   return undefined;
 }
 
+function optionComparableValue(
+  option: LessonQuestionOption
+): string | number | boolean {
+  if (
+    typeof option === "string" ||
+    typeof option === "number" ||
+    typeof option === "boolean"
+  ) {
+    return option;
+  }
+
+  return option.value;
+}
+
 function normalizeObjectiveResponse(
-  questionType: string,
+  question: LessonQuestion,
   value: unknown
 ): unknown {
-  if (questionType === "true_false") {
-    return normalizeTrueFalseValue(value);
+  if (
+    question.question_type ===
+    "true_false"
+  ) {
+    return normalizeTrueFalseValue(
+      value
+    );
+  }
+
+  if (
+    question.question_type ===
+    "multiple_choice"
+  ) {
+    const options = Array.isArray(
+      question.options
+    )
+      ? question.options
+      : [];
+
+    /*
+     * Multiple-choice answer keys are stored as zero-based option
+     * indexes. The UI stores the selected option value, so convert
+     * that value back to its index before calling the grading RPC.
+     */
+    if (
+      typeof value === "number" &&
+      Number.isInteger(value) &&
+      value >= 0 &&
+      value < options.length
+    ) {
+      return value;
+    }
+
+    const selectedText =
+      String(value).trim();
+
+    const selectedIndex =
+      options.findIndex(
+        (option) =>
+          String(
+            optionComparableValue(
+              option
+            )
+          ).trim() === selectedText
+      );
+
+    if (selectedIndex >= 0) {
+      return selectedIndex;
+    }
+
+    throw new Error(
+      "Die ausgewählte Antwort konnte keiner Antwortoption zugeordnet werden."
+    );
   }
 
   return value;
@@ -213,7 +282,7 @@ export async function submitObjectiveResponse(
    */
   const normalizedResponse =
     normalizeObjectiveResponse(
-      question.question_type,
+      question,
       response
     );
 
@@ -225,6 +294,22 @@ export async function submitObjectiveResponse(
   ) {
     throw new Error(
       "Die Wahr/Falsch-Antwort konnte nicht eindeutig verarbeitet werden."
+    );
+  }
+
+  if (
+    question.question_type ===
+      "multiple_choice" &&
+    (
+      typeof normalizedResponse !==
+        "number" ||
+      !Number.isInteger(
+        normalizedResponse
+      )
+    )
+  ) {
+    throw new Error(
+      "Die Multiple-Choice-Antwort konnte nicht eindeutig verarbeitet werden."
     );
   }
 
