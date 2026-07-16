@@ -13,7 +13,87 @@ const paths=["/","/paths","/conversation","/simulator","/reports","/vocabulary",
 function norm(value:unknown,reply=""):AiFeedback|null{if(!value||typeof value!=="object")return reply?{reply,corrections:[],vocabulary:[],scores:{},nextQuestion:""}:null;const r=value as Partial<AiFeedback>;return{...r,reply:typeof r.reply==="string"?r.reply:reply,corrections:Array.isArray(r.corrections)?r.corrections:[],vocabulary:Array.isArray(r.vocabulary)?r.vocabulary:[],scores:r.scores&&typeof r.scores==="object"?r.scores:{},nextQuestion:typeof r.nextQuestion==="string"?r.nextQuestion:""}as AiFeedback;}
 function Shell({children,dark,setDark,session,onAuth,role}:{children:React.ReactNode;dark:boolean;setDark:(v:boolean)=>void;session:Session|null;onAuth:()=>void;role:string}){const[open,setOpen]=useState(false);const loc=useLocation();useEffect(()=>{setOpen(false);stopSpeaking()},[loc.pathname]);const nav=<><div className="brand"><div className="mark">EC</div><div><b>{T.app}</b><small>{T.version}</small></div></div><nav>{T.nav.map((n,i)=>{if(i===8&&!['coordinator','admin'].includes(role))return null;const I=icons[i];return<NavLink key={n}to={paths[i]}end={i===0}><I size={18}/>{n}</NavLink>})}</nav><div className="account"><b>{session?.user.email||T.guest}</b><small>{session?T.cloud:supabaseConfigured?T.connected:T.demo}</small></div></>;return<div className={dark?"app dark":"app"}><aside className="sidebar">{nav}</aside>{open&&<div className="drawer-layer"><button className="drawer-backdrop"onClick={()=>setOpen(false)}/><aside className="mobile-drawer"><button className="drawer-close"onClick={()=>setOpen(false)}><X/>{T.close}</button>{nav}</aside></div>}<section className="main"><header><div className="mobile-brand"><button className="icon"aria-label={T.open_nav}onClick={()=>setOpen(true)}><Menu/></button><span>{T.app}</span></div><span className="desktop-subtitle">{T.header}</span><div className="header-actions"><button className="icon"aria-label={T.theme}onClick={()=>setDark(!dark)}>{dark?<Sun/>:<Moon/>}</button><button className="auth-button"onClick={onAuth}>{session?<><LogOut size={16}/><span>{T.logout}</span></>:<><LogIn size={16}/><span>{T.login}</span></>}</button></div></header><main>{children}</main></section></div>}
 function Head({title,text}:{title:string;text:string}){return<div className="page-head"><small>{T.app.toUpperCase()}</small><h1>{title}</h1><p>{text}</p></div>}function Metric({label,value,detail}:{label:string;value:string;detail:string}){return<div className="metric glass"><span>{label}</span><b>{value}</b><small>{detail}</small></div>}
-function DailyLesson({lesson,prefs}:{lesson:AiFeedback;prefs:VoicePreferences}){const l=lesson.lesson as any;if(!l)return<><p>{lesson.reply}</p><FeedbackPanel feedback={lesson}prefs={prefs}speechId="daily"/></>;return<div className="daily-lesson"><h3>{l.title??T.daily}</h3><section><h4>{"Heutiges Lernziel"}</h4><p>{l.learningObjective}</p></section><section><h4>{"Schlüsselkonzepte"}</h4><ul>{(l.keyConcepts??[]).map((x:string)=><li key={x}>{x}</li>)}</ul></section><section><h4>{"Typische Fehler"}</h4><ul>{(l.commonMistakes??[]).map((x:string)=><li key={x}>{x}</li>)}</ul></section><section><h4>{"Neue Fachbegriffe"}</h4><dl>{(l.technicalTerms??[]).map((x:any)=><div key={x.term}><dt>{x.term}</dt><dd>{x.meaning}</dd></div>)}</dl></section><section><h4>{"Reflexionsfrage"}</h4><p>{l.reflectionQuestion}</p></section><section><h4>{"Mini-Übung"}</h4><p>{l.miniExercise}</p></section><section><h4>{"Empfohlenes Modul"}</h4><p>{l.recommendedModule} · {l.estimatedMinutes??15} min</p></section><SpeechButton text={[lesson.reply,l.learningObjective,...(l.keyConcepts??[]),l.reflectionQuestion,l.miniExercise].filter(Boolean).join('. ')}prefs={prefs}speechId="daily-rich"/></div>}
+function DailyLesson({lesson,prefs}:{lesson:AiFeedback;prefs:VoicePreferences}){
+  const l=lesson.lesson as any;
+
+  if(!l){
+    return<>
+      {lesson.reply?.trim()&&<p className="daily-lesson-introduction">{lesson.reply}</p>}
+      <FeedbackPanel feedback={lesson}prefs={prefs}speechId="daily"/>
+    </>;
+  }
+
+  const rawTitle=typeof l.title==="string"?l.title.trim():"";
+  const title=rawTitle&&rawTitle.length<=80?rawTitle:T.daily;
+  const longTitle=rawTitle.length>80?rawTitle:"";
+  const reply=typeof lesson.reply==="string"?lesson.reply.trim():"";
+  const introduction=[longTitle,reply].filter((value,index,array)=>value&&array.indexOf(value)===index).join("\n\n");
+
+  const learningObjective=typeof l.learningObjective==="string"?l.learningObjective.trim():"";
+  const keyConcepts=Array.isArray(l.keyConcepts)?l.keyConcepts.filter((value:unknown):value is string=>typeof value==="string"&&Boolean(value.trim())):[];
+  const commonMistakes=Array.isArray(l.commonMistakes)?l.commonMistakes.filter((value:unknown):value is string=>typeof value==="string"&&Boolean(value.trim())):[];
+  const technicalTerms=Array.isArray(l.technicalTerms)?l.technicalTerms.filter((value:any)=>value&&typeof value==="object"&&(String(value.term??"").trim()||String(value.meaning??"").trim())):[];
+  const reflectionQuestion=typeof l.reflectionQuestion==="string"?l.reflectionQuestion.trim():"";
+  const miniExercise=typeof l.miniExercise==="string"?l.miniExercise.trim():"";
+  const recommendedModule=typeof l.recommendedModule==="string"?l.recommendedModule.trim():"";
+  const estimatedMinutes=typeof l.estimatedMinutes==="number"&&Number.isFinite(l.estimatedMinutes)?l.estimatedMinutes:15;
+
+  const speechText=[
+    title,
+    introduction,
+    learningObjective,
+    ...keyConcepts,
+    ...commonMistakes,
+    ...technicalTerms.map((value:any)=>`${String(value.term??"").trim()}: ${String(value.meaning??"").trim()}`),
+    reflectionQuestion,
+    miniExercise,
+    recommendedModule
+  ].filter(Boolean).join(". ");
+
+  return<div className="daily-lesson">
+    <div className="feedback-heading-row">
+      <h3>{title}</h3>
+      <SpeechButton text={speechText}prefs={prefs}speechId="daily-rich"/>
+    </div>
+
+    {introduction&&<p className="daily-lesson-introduction">{introduction}</p>}
+
+    <section className="daily-lesson-section">
+      <h4>{"Heutiges Lernziel"}</h4>
+      <p>{learningObjective||"Für diese Tageslektion wurde noch kein separates Lernziel erzeugt."}</p>
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Schlüsselkonzepte"}</h4>
+      {keyConcepts.length?<ul>{keyConcepts.map((value:string,index:number)=><li key={`${value}-${index}`}>{value}</li>)}</ul>:<p className="note">{"Noch keine strukturierten Schlüsselkonzepte verfügbar."}</p>}
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Typische Fehler"}</h4>
+      {commonMistakes.length?<ul>{commonMistakes.map((value:string,index:number)=><li key={`${value}-${index}`}>{value}</li>)}</ul>:<p className="note">{"Noch keine strukturierten typischen Fehler verfügbar."}</p>}
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Neue Fachbegriffe"}</h4>
+      {technicalTerms.length?<dl className="daily-term-list">{technicalTerms.map((value:any,index:number)=><div key={`${String(value.term??"Begriff")}-${index}`}><dt>{String(value.term??"Begriff")}</dt><dd>{String(value.meaning??"")}</dd></div>)}</dl>:<p className="note">{"Noch keine neuen Fachbegriffe verfügbar."}</p>}
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Reflexionsfrage"}</h4>
+      <p>{reflectionQuestion||"Welche Verbindung besteht zwischen diesem Thema und einer konkreten ökologischen Untersuchung?"}</p>
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Mini-Übung"}</h4>
+      <p>{miniExercise||"Fassen Sie die wichtigste Aussage dieser Tageslektion in zwei bis drei präzisen Sätzen zusammen."}</p>
+    </section>
+
+    <section className="daily-lesson-section">
+      <h4>{"Empfohlenes Modul"}</h4>
+      <p>{recommendedModule||"Versuchsdesign"} · {estimatedMinutes} min</p>
+    </section>
+  </div>
+}
 function Dashboard({p,quota,onQuotaChange,prefs}:{p:Progress;quota:QuotaStatus|null;onQuotaChange:(u:AiFeedback["usage"])=>void;prefs:VoicePreferences}){const nav=useNavigate(),done=countDone(p.completed),total=validIds.size,percent=total?Math.min(100,Math.round(done/total*100)):0;const[lesson,setLesson]=useState<AiFeedback|null>(null),[loading,setLoading]=useState(false);useEffect(()=>{void loadTodayDailyLesson().then(r=>{if(r?.lesson_data)setLesson(r.lesson_data)}).catch(console.error)},[p.completed.join(',')]);async function generate(){setLoading(true);try{const r=await askAi({mode:"daily_lesson",message:T.daily_prompt,context:{completed:p.completed,modules:modules.map(m=>({id:m.id,title:m.title})),targetLevel:"adaptive"}});setLesson(r);onQuotaChange(r.usage);await Promise.all([saveConversationTurn({mode:"daily_lesson",message:T.daily_message,context:{completed:p.completed}},r),saveTodayDailyLesson(r)]);await saveVocabularySuggestions(
   Array.isArray(r.vocabulary) ? r.vocabulary : [],
   "daily_lesson"

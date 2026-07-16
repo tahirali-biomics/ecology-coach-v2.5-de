@@ -315,7 +315,7 @@ export function LessonDetail({
       const grade =
         await submitObjectiveResponse(
           currentAttempt.id,
-          question.id,
+          question,
           answer
         );
 
@@ -652,6 +652,20 @@ export function LessonDetail({
                                     [question.id]:
                                       normalized.value,
                                   })
+                                );
+
+                                setGrades(
+                                  (current) => {
+                                    const next = {
+                                      ...current,
+                                    };
+
+                                    delete next[
+                                      question.id
+                                    ];
+
+                                    return next;
+                                  }
                                 );
 
                                 setError(

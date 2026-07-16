@@ -78,56 +78,6 @@ export type WrittenEvaluation = {
   satisfactory: boolean;
 };
 
-// === Normalization functions for objective responses ===
-
-function normalizeTrueFalseValue(
-  value: unknown
-): boolean | undefined {
-  if (typeof value === "boolean") {
-    return value;
-  }
-
-  if (typeof value === "number") {
-    if (value === 1) return true;
-    if (value === 0) return false;
-  }
-
-  if (typeof value === "string") {
-    const normalized = value
-      .trim()
-      .toLowerCase();
-
-    if (
-      normalized === "true" ||
-      normalized === "richtig" ||
-      normalized === "1"
-    ) {
-      return true;
-    }
-
-    if (
-      normalized === "false" ||
-      normalized === "falsch" ||
-      normalized === "0"
-    ) {
-      return false;
-    }
-  }
-
-  return undefined;
-}
-
-function normalizeObjectiveResponse(
-  questionType: string,
-  value: unknown
-): unknown {
-  if (questionType === "true_false") {
-    return normalizeTrueFalseValue(value);
-  }
-
-  return value;
-}
-
 function requireSupabase() {
   if (!supabase) {
     throw new Error("Supabase ist nicht konfiguriert.");
@@ -198,52 +148,23 @@ export async function startLessonAttempt(
 
 export async function submitObjectiveResponse(
   attemptId: number,
-  question: LessonQuestion,
+  questionId: number,
   response: unknown
 ): Promise<ObjectiveGrade> {
   const client = requireSupabase();
 
-  /*
-   * Normalise the learner response before it reaches PostgreSQL.
-   *
-   * In particular, the visible German labels "Richtig" and "Falsch"
-   * must be stored as JSON booleans true and false. The database RPC
-   * remains responsible for comparing the response with the protected
-   * answer key and calculating the score.
-   */
-  const normalizedResponse =
-    normalizeObjectiveResponse(
-      question.question_type,
-      response
-    );
-
-  if (
-    question.question_type ===
-      "true_false" &&
-    typeof normalizedResponse !==
-      "boolean"
-  ) {
-    throw new Error(
-      "Die Wahr/Falsch-Antwort konnte nicht eindeutig verarbeitet werden."
-    );
-  }
-
-  const { data, error } =
-    await client.rpc(
-      "submit_objective_response",
-      {
-        p_attempt_id: attemptId,
-        p_question_id: question.id,
-        p_response:
-          normalizedResponse,
-      }
-    );
+  const { data, error } = await client.rpc(
+    "submit_objective_response",
+    {
+      p_attempt_id: attemptId,
+      p_question_id: questionId,
+      p_response: response,
+    }
+  );
 
   if (error) throw error;
 
-  const row = Array.isArray(data)
-    ? data[0]
-    : data;
+  const row = Array.isArray(data) ? data[0] : data;
 
   if (!row) {
     throw new Error(

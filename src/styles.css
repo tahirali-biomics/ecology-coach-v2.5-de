@@ -371,3 +371,19 @@
   outline: 3px solid rgba(19, 135, 91, 0.25);
   outline-offset: 5px;
 }
+
+/* Version 2.5: robust structured daily lesson */
+.feedback-heading-row {display:flex;align-items:flex-start;justify-content:space-between;gap:1rem}
+.daily-lesson{display:grid;gap:1rem}
+.daily-lesson h3{margin:0;font:800 1.35rem/1.25 Manrope,sans-serif;overflow-wrap:anywhere}
+.daily-lesson-introduction{margin:0;max-width:95ch;font-weight:400;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.daily-lesson-section{display:grid;gap:.55rem;padding-top:.85rem;border-top:1px solid var(--line)}
+.daily-lesson-section h4{margin:0;font-weight:800}
+.daily-lesson-section p,.daily-lesson-section ul,.daily-lesson-section dl{margin-top:0;margin-bottom:0}
+.daily-lesson-section ul{padding-left:1.25rem;display:grid;gap:.4rem}
+.daily-term-list{display:grid;gap:.7rem}
+.daily-term-list>div{display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:1rem}
+.daily-term-list dt{font-weight:800;overflow-wrap:anywhere}
+.daily-term-list dd{margin:0;overflow-wrap:anywhere}
+@media(max-width:600px){.feedback-heading-row{align-items:flex-start}.feedback-heading-row>button{flex:0 0 auto}.daily-term-list>div{grid-template-columns:1fr;gap:.2rem}}
+
