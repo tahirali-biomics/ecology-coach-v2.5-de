@@ -1,48 +1,59 @@
 name: Deploy React app to GitHub Pages
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
 concurrency:
   group: pages
   cancel-in-progress: true
+
 jobs:
   deploy:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version-file: .nvmrc
-          package-manager-cache: false
+          node-version: 22
+          cache: npm
+          cache-dependency-path: package-lock.json
+
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund --prefer-online
-        env:
-          npm_config_registry: https://registry.npmjs.org/
-          npm_config_fetch_retries: 5
-          npm_config_fetch_retry_maxtimeout: 120000
+        run: npm ci --no-audit --no-fund
+
       - name: Type-check
         run: npm run typecheck
-      - name: Build
+
+      - name: Build application
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-      - name: Upload artifact
+        uses: actions/configure-pages@v6
+
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
-      - name: Deploy
+
+      - name: Deploy GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
