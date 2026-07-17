@@ -400,3 +400,184 @@
   color: var(--ink) !important;
 }
 
+
+/* ==========================================================
+   Version 2.5: smartphone layout fixes
+   Prevent lesson-card overlap and coordinator overflow
+   ========================================================== */
+
+@media (max-width: 700px) {
+  .module {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .lesson {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 52px;
+    align-items: start;
+    gap: 0.85rem;
+    height: auto;
+    min-height: 0;
+    padding: 1rem 0;
+    overflow: visible;
+  }
+
+  .lesson .lesson-open {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 0;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .lesson .lesson-open b,
+  .lesson .lesson-open p {
+    position: static;
+    width: auto;
+    max-width: 100%;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    white-space: normal;
+  }
+
+  .lesson .lesson-open b {
+    line-height: 1.25;
+  }
+
+  .lesson .lesson-open p {
+    line-height: 1.45;
+    margin: 0.45rem 0 0;
+  }
+
+  .lesson > button:not(.lesson-open) {
+    width: 52px;
+    height: 52px;
+    min-height: 52px;
+    padding: 0;
+    align-self: start;
+  }
+
+  .coordinator-layout {
+    grid-template-columns: minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+    gap: 1rem;
+  }
+
+  .coordinator-layout > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .coordinator-layout .panel {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .coordinator-layout .actions,
+  .coordinator-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+  }
+
+  .coordinator-layout input,
+  .coordinator-layout select,
+  .coordinator-layout textarea,
+  .coordinator-layout button,
+  .coordinator-form-row input,
+  .coordinator-form-row select,
+  .coordinator-form-row button {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .coordinator-layout button {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .reset-option {
+    align-items: flex-start;
+    line-height: 1.4;
+  }
+
+  .reset-option input {
+    width: auto;
+    flex: 0 0 auto;
+    margin-top: 0.2rem;
+  }
+
+  .coordinator-layout .metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-inline: contain;
+    border-radius: 14px;
+  }
+
+  .table-wrap table {
+    width: max-content;
+    min-width: 860px;
+  }
+
+  .table-wrap th,
+  .table-wrap td {
+    white-space: nowrap;
+  }
+
+  .page-head,
+  .glass,
+  .panel,
+  .module,
+  .lesson-detail,
+  .daily-lesson {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .page-head h1,
+  .page-head p,
+  .module h2 {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 420px) {
+  .lesson {
+    grid-template-columns: minmax(0, 1fr) 48px;
+    gap: 0.7rem;
+  }
+
+  .lesson > button:not(.lesson-open) {
+    width: 48px;
+    height: 48px;
+    min-height: 48px;
+  }
+
+  .module {
+    padding: 1rem;
+  }
+
+  .module h2 {
+    font-size: 1.32rem;
+    line-height: 1.22;
+  }
+
+  .page-head h1 {
+    font-size: clamp(2.1rem, 12vw, 3rem);
+  }
+}
