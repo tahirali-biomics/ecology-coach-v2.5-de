@@ -183,7 +183,7 @@ useEffect(() => {
         ? error.message
         : JSON.stringify(error)
     );
-  })}}>{courses.map(c=><option key={c.id}value={c.id}>{c.name}</option>)}</select><h3>{"Studierende einladen"}</h3><div className="actions"><input type="email"value={email}onChange={e=>setEmail(e.target.value)}placeholder="email@example.org"/><button onClick={()=>void invite()}><Mail/> {"Einladen"}</button></div><label className="reset-option"><input type="checkbox"checked={deleteData}onChange={e=>setDeleteData(e.target.checked)}/><span>Lerndaten der aktuellen Kohorte löschen</span></label><button className="warning"onClick={()=>void archive()}><Archive/> {"Semester archivieren und neu starten"}</button>{message&&<p className="note">{message}</p>}</div><div><div className="metrics"><Metric label={"Studierende"}value={String(members.length)}detail={"im Kurs"}/><Metric label={"Mittlerer Fortschritt"}value={`${avg}%`}detail={"Kohorte"}/><Metric label={"KI-Aktivität"}value={String(members.reduce((a,b)=>a+b.turns,0))}detail={"Antworten"}/><Metric label={T.vocab}value={String(members.reduce((a,b)=>a+b.vocabulary,0))}detail={"Begriffe"}/></div><section className="panel glass table-wrap"><table><thead><tr><th>{"Studierende"}</th>
+  })}}>{courses.map(c=><option key={c.id}value={c.id}>{c.name}</option>)}</select><h3>{"Studierende einladen"}</h3><div className="actions"><input type="email"value={email}onChange={e=>setEmail(e.target.value)}placeholder="email@example.org"/><button onClick={()=>void invite()}><Mail/> {"Einladen"}</button></div><label className="reset-option"><input type="checkbox"checked={deleteData}onChange={e=>setDeleteData(e.target.checked)}/><span>Lerndaten der aktuellen Kohorte löschen</span></label><button className="warning"onClick={()=>void archive()}><Archive/> {"Semester archivieren und neu starten"}</button>{message&&<p className="note">{message}</p>}</div><div className="coordinator-content"><div className="metrics"><Metric label={"Studierende"}value={String(members.length)}detail={"im Kurs"}/><Metric label={"Mittlerer Fortschritt"}value={`${avg}%`}detail={"Kohorte"}/><Metric label={"KI-Aktivität"}value={String(members.reduce((a,b)=>a+b.turns,0))}detail={"Antworten"}/><Metric label={T.vocab}value={String(members.reduce((a,b)=>a+b.vocabulary,0))}detail={"Begriffe"}/></div><section className="panel glass table-wrap"><table><thead><tr><th>{"Studierende"}</th>
 {/* === PART Q: New columns in header === */}
 <th>Lektionen</th>
 <th>Beherrscht</th>
@@ -195,14 +195,19 @@ useEffect(() => {
 const assessment = lessonSummary.find(
   (entry) => entry.user_id === m.userId
 );
-return<tr key={m.userId}><td>{m.displayName}</td>
+return<tr key={m.userId}>
+<td data-label="Studierende">{m.displayName}</td>
 {/* === PART Q: New columns in rows === */}
-<td>{assessment?.lessons_completed ?? 0} / 24</td>
-<td>{assessment?.lessons_mastered ?? 0}</td>
-<td>{assessment?.objective_questions_answered ?? 0}</td>
-<td>{assessment?.objective_questions_correct ?? 0}</td>
-<td>{assessment?.total_attempts ?? 0}</td>
-<td><div className="progress-bar"><span style={{width:`${pct}%`}}/></div>{pct}%</td><td>{m.turns}</td><td>{m.vocabulary}</td><td>{m.lastActivity?new Date(m.lastActivity).toLocaleDateString():"–"}</td></tr>})}</tbody></table></section></div></section></>}
+<td data-label="Lektionen">{assessment?.lessons_completed ?? 0} / 24</td>
+<td data-label="Beherrscht">{assessment?.lessons_mastered ?? 0}</td>
+<td data-label="Fragen">{assessment?.objective_questions_answered ?? 0}</td>
+<td data-label="Richtig">{assessment?.objective_questions_correct ?? 0}</td>
+<td data-label="Versuche">{assessment?.total_attempts ?? 0}</td>
+<td data-label="Fortschritt"><div className="progress-bar"><span style={{width:`${pct}%`}}/></div>{pct}%</td>
+<td data-label="KI">{m.turns}</td>
+<td data-label={T.vocab}>{m.vocabulary}</td>
+<td data-label="Letzte Aktivität">{m.lastActivity?new Date(m.lastActivity).toLocaleDateString():"–"}</td>
+</tr>})}</tbody></table></section></div></section></>}
 function Join(){const[params]=useSearchParams(),[msg,setMsg]=useState("Einladung wird geprüft …");useEffect(()=>{const token=params.get('token');if(token)void acceptInvitation(token).then(()=>setMsg("Sie sind dem Kurs beigetreten.")).catch(e=>setMsg(String(e)))},[]);return<><Head title={"Kurseinladung"}text={msg}/></>}
 function VoiceSettings({prefs,setPrefs}:{prefs:VoicePreferences;setPrefs:(v:VoicePreferences)=>void}){const[voices,setVoices]=useState<SpeechSynthesisVoice[]>([]);useEffect(()=>{const load=()=>setVoices(getVoices());load();speechSynthesis?.addEventListener?.('voiceschanged',load);return()=>speechSynthesis?.removeEventListener?.('voiceschanged',load)},[]);function update(x:Partial<VoicePreferences>){const n={...prefs,...x};setPrefs(n);saveVoicePreferences(n)}return<><Head title={T.settings}text={"Spracherkennung und Sprachausgabe anpassen."}/><section className="panel glass settings-grid"><label><span>{"Sprachfunktionen"}</span><input type="checkbox"checked={prefs.enabled}onChange={e=>update({enabled:e.target.checked})}/></label><label><span>{"KI-Antworten automatisch vorlesen"}</span><input type="checkbox"checked={prefs.autoRead}onChange={e=>update({autoRead:e.target.checked})}/></label><label><span>{"Geschwindigkeit"}</span><select value={prefs.rate}onChange={e=>update({rate:e.target.value as any})}><option value="slow">{"Langsam"}</option><option value="normal">{"Normal"}</option></select></label><label><span>{"Stimme"}</span><select value={prefs.voiceURI}onChange={e=>update({voiceURI:e.target.value})}><option value="">{"Automatisch beste Stimme"}</option>{voices.map(v=><option key={v.voiceURI}value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label><div className="actions"><button onClick={()=>void speakText("Dies ist eine klare und sachliche Teststimme für ökologische Lerninhalte.",prefs,'settings')}><Volume2/> {"Stimme testen"}</button><button onClick={stopSpeaking}>{"Stoppen"}</button></div></section></>}
 function LessonRoute({courseId,prefs,onProgressChanged}:{courseId:number|null;prefs:VoicePreferences;onProgressChanged:()=>void}){const{lessonId}=useParams<{lessonId:string}>();const navigate=useNavigate();if(!lessonId)return<><Head title={"Lektion nicht gefunden"}text={"Für diese Adresse wurde keine Lektion gefunden."}/><button onClick={()=>navigate("/paths")}>{"Zurück zu den Lernpfaden"}</button></>;return<LessonDetail lessonId={decodeURIComponent(lessonId)}courseId={courseId}voicePreferences={prefs}onBack={()=>navigate("/paths")}onProgressChanged={onProgressChanged}/>}
