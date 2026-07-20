@@ -1,3 +1,8 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
 import { loadCourseLessonSummary, type CourseLessonSummary } from "./coordinator";
 import React,{useEffect,useRef,useState}from"react";
 import{NavLink,Route,Routes,useLocation,useNavigate,useParams,useSearchParams}from"react-router-dom";
