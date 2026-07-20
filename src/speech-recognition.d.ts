@@ -1,3 +1,9 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 interface SpeechRecognitionAlternative {
   readonly transcript: string;
   readonly confidence: number;

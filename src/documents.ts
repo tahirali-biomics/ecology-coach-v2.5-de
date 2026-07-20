@@ -1,1 +1,7 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import{ supabase }from"./supabase";export type CourseDocument={id:number;title:string;source_name:string;active:boolean;created_at:string};export async function loadCourseDocuments():Promise<CourseDocument[]>{if(!supabase)return[];const{data,error}=await supabase.from("course_documents").select("id,title,source_name,active,created_at").eq("active",true).order("created_at",{ascending:false});if(error)throw error;return(data??[])as CourseDocument[];}

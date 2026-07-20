@@ -1,3 +1,9 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import type { AiFeedback, AiRequest } from "./ai";
 import { supabase } from "./supabase";
 export type SavedConversationTurn={id:number;mode:string;user_text:string;ai_reply:string|null;feedback:Record<string,unknown>|null;created_at:string};

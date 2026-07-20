@@ -1,3 +1,9 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import type { AiFeedback } from "./ai";import{ supabase }from"./supabase";
 export async function loadTodayDailyLesson(){if(!supabase)return null;const{data:{user}}=await supabase.auth.getUser();if(!user)return null;const today=new Date().toISOString().slice(0,10);const{data,error}=await supabase.from("daily_lessons").select("*").eq("user_id",user.id).eq("lesson_date",today).maybeSingle();if(error)throw error;return data;}
 export async function saveTodayDailyLesson(result:AiFeedback){if(!supabase)return;const{data:{user}}=await supabase.auth.getUser();if(!user)return;const today=new Date().toISOString().slice(0,10);const{error}=await supabase.from("daily_lessons").upsert({user_id:user.id,lesson_date:today,title:String((result.lesson as any)?.title??"Adaptive Tageslektion"),lesson_data:result,updated_at:new Date().toISOString()},{onConflict:"user_id,lesson_date"});if(error)throw error;}

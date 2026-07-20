@@ -1,8 +1,16 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import {
   useEffect,
   useMemo,
   useState,
 } from "react";
+
+import { MarkdownText } from "./MarkdownText";
 
 import {
   CheckCircle2,
@@ -785,7 +793,7 @@ export function LessonDetail({
                   </h3>
 
                   <p>
-                    {evaluation.feedback}
+                    <MarkdownText text={evaluation.feedback}/>
                   </p>
 
                   {evaluation

@@ -1,1 +1,7 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import{useSyncExternalStore}from"react";import{Square,Volume2}from"lucide-react";import{getSpeechStatus,speakText,stopSpeaking,subscribeSpeechStatus,type VoicePreferences}from"./voice";export function SpeechButton({text,prefs,speechId,compact=false,label="Vorlesen"}:{text:unknown;prefs:VoicePreferences;speechId:string;compact?:boolean;label?:string}){const s=useSyncExternalStore(subscribeSpeechStatus,getSpeechStatus,getSpeechStatus),t=typeof text==="string"?text.trim():"",active=s.speaking&&s.speechId===speechId;return<button type="button"className={`${compact?"speak-inline":""} ${active?"speech-active":""}`}disabled={!prefs.enabled||!t}onClick={()=>active?stopSpeaking():void speakText(t,prefs,speechId)}>{active?<><Square size={16}/>{!compact&&"Stoppen"}</>:<><Volume2 size={17}/>{!compact&&label}</>}</button>}

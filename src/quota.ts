@@ -1,3 +1,9 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import { supabase } from "./supabase";
 export type QuotaStatus={used:number;limit:number;remaining:number;usageDate:string};
 export async function loadQuotaStatus():Promise<QuotaStatus|null>{if(!supabase)return null;const{data:{user},error:a}=await supabase.auth.getUser();if(a)throw a;if(!user)return null;const today=new Date().toISOString().slice(0,10);const[{data:u,error:ue},{data:s,error:se}]=await Promise.all([supabase.from("ai_daily_usage").select("request_count,usage_date").eq("user_id",user.id).eq("usage_date",today).maybeSingle(),supabase.from("user_ai_settings").select("daily_limit").eq("user_id",user.id).maybeSingle()]);if(ue)throw ue;if(se)throw se;const limit=s?.daily_limit??30,used=u?.request_count??0;return{used,limit,remaining:Math.max(limit-used,0),usageDate:today};}

@@ -1,0 +1,42 @@
+cff-version: 1.2.0
+message: "If you use Ecology Coach, please cite the software using the metadata below."
+title: "Ecology Coach"
+type: software
+version: "v2.5 DE"
+date-released: "2026-07-20"
+authors:
+  - family-names: "Tahir"
+    given-names: "Ali"
+    affiliation: "Institute for Plant Sciences, University of Cologne"
+repository-code: "https://github.com/tahirali-biomics/ecology-coach-v2.5-de"
+url: "url: "https://doi.org/10.5281/zenodo.21451699"
+license: "LicenseRef-Proprietary"
+abstract: >-
+  Interactive AI-assisted German course companion for university-level
+  ecology, including lecture-grounded lessons, adaptive tutoring, ecological
+  simulations, formative assessment, scientific writing feedback, voice
+  interaction, progress tracking, and role-controlled course coordination.
+keywords:
+  - ecology
+  - biology education
+  - AI-assisted learning
+  - scientific reasoning
+  - formative assessment
+  - German-language teaching
+identifiers:
+  - description: "This is the DOI for all versions of Ecology Coach"
+    type: doi
+    value: "10.5281/zenodo.21451698"
+  - description: "This is the DOI for version v2.5 DE specifically"
+    type: doi
+    value: "10.5281/zenodo.21451699"
+preferred-citation:
+  type: software
+  title: "Ecology Coach"
+  authors:
+    - family-names: "Tahir"
+      given-names: "Ali"
+  version: "v2.5 DE"
+  date-released: "2026-07-20"
+  doi: "10.5281/zenodo.21451699"
+  url: "https://github.com/tahirali-biomics/ecology-coach-v2.5-de"

@@ -1,3 +1,9 @@
+/*
+ * Ecology Coach
+ * Copyright © 2026 Dr. Tahir Ali
+ * All rights reserved. See LICENSE.
+ */
+
 import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
